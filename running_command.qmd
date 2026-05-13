@@ -1,0 +1,13 @@
+```{bash}
+
+cd /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data
+nextflow run ../main.nf \
+    --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_path.tsv \
+    --ref /mnt/storage13/ahri/Anopheles_stephensi/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.fna \
+    --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff \
+    --bed /mnt/storage13/ahri/Anopheles_stephensi/bed_file/resistance_regions.bed \
+    --snpeff_db An_stephen \
+    --outdir ./resistance_result \
+    -resume
+
+```

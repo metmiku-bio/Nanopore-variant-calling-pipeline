@@ -15,8 +15,9 @@ process ANNOTATE_INDELS {
     val threads
     
     output:
-    path "indels.ann.vcf.gz"
-    path "combined_indels_trans.txt"
+    path "indels.ann.vcf.gz", emit: annotated_indels_vcf
+    path "combined_indels_trans.txt", emit: indels_table
+    path "indels.vcf.gz", emit: raw_indels_vcf
     
     script:
     """
@@ -25,14 +26,15 @@ process ANNOTATE_INDELS {
     bcftools index indels.vcf.gz
     
     # Annotate with snpEff
-    snpEff ${snpeff_db} indels.vcf.gz > indels.ann.vcf.gz
+
+    java -jar  /mnt/storage13/ahri/snpEff/snpEff.jar ${snpeff_db} indels.vcf.gz > indels.ann.vcf
+    bgzip -f indels.ann.vcf
+    bcftools index indels.ann.vcf.gz
     
     # Convert to tabular format
     (echo -e "SAMPLE\\tCHROM\\tPOS\\tREF\\tALT\\tQUAL\\tGT\\tAD\\tDP\\tANN"; \\
         bcftools query -f "[%SAMPLE\\t%CHROM\\t%POS\\t%REF\\t%ALT\\t%QUAL\\t%GT\\t%AD\\t%DP\\t%ANN\\n]" \\
         indels.ann.vcf.gz) > combined_indels_trans.txt
     
-    # Compress annotation VCF
-    bcftools index indels.ann.vcf.gz
     """
 }

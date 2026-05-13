@@ -2,37 +2,29 @@
 
 /*
  * Coverage Calculation Module
- * Calculates per-base and per-amplicon coverage
+ * Generates flagstat statistics for BAM files
  */
 
 process CALCULATE_COVERAGE {
-    tag "coverage: ${sample}"
-    publishDir "${params.outdir}/coverage/${sample}", mode: 'copy'
+    tag "flagstat: ${sample}"
+    publishDir "${params.outdir}/flagstat", mode: 'copy'
     
     input:
-    tuple val(sample), path(bam), path(bai)
-    path bed
-    val threads
+    tuple val(sample), path(bam), path(bai) 
+    path(bed)
     
     output:
-    tuple val(sample), path("${sample}_coverage_summary.txt"), path("${sample}.per-base.bed.gz")
+    path "${sample}_flagstat.txt", emit: flagstat
+    path "${sample}_coverage_mean.txt" , emit:coverage
     
     script:
     """
-    # Calculate coverage statistics
-    mosdepth -x -b ${bed} ${sample} ${bam}
-    
-    # Calculate mean coverage per amplicon
+    # Generate flagstat statistics
+    samtools flagstat ${bam} > ${sample}_flagstat.txt
     bedtools coverage -a ${bed} -b ${bam} -mean > ${sample}_coverage_mean.txt
     
-    # Create summary file
-    cat > ${sample}_coverage_summary.txt << EOL
-Sample: ${sample}
-Total reads: \$(samtools view -c ${bam})
-Mean coverage: \$(awk '{sum+=\$NF} END {print sum/NR}' ${sample}_coverage_mean.txt)
-EOL
-    
-    # Rename per-base file for consistency
-    mv ${sample}.per-base.bed.gz ${sample}.per-base.bed.gz.tmp || true
+    # Display basic stats (optional, for logging)
+    echo "=== Flagstat for ${sample} ==="
+    cat ${sample}_flagstat.txt
     """
 }

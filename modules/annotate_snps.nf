@@ -15,8 +15,9 @@ process ANNOTATE_SNPS {
     val threads
     
     output:
-    path "snps.ann.vcf.gz"
-    path "combined_snps_trans.txt"
+    path "snps.ann.vcf.gz", emit: annotated_snps_vcf
+    path "combined_snps_trans.txt", emit: snps_table
+    path "snps.vcf.gz", emit: raw_snps_vcf
     
     script:
     """
@@ -25,14 +26,14 @@ process ANNOTATE_SNPS {
     bcftools index snps.vcf.gz
     
     # Annotate with snpEff
-    snpEff ${snpeff_db} snps.vcf.gz > snps.ann.vcf.gz
+    java -jar  /mnt/storage13/ahri/snpEff/snpEff.jar ${snpeff_db}  -ud 0 snps.vcf.gz > snps.ann.vcf
+    bgzip -f snps.ann.vcf
+    bcftools index snps.ann.vcf.gz
     
     # Convert to tabular format
     (echo -e "SAMPLE\\tCHROM\\tPOS\\tREF\\tALT\\tQUAL\\tGT\\tAD\\tDP\\tANN"; \\
         bcftools query -f "[%SAMPLE\\t%CHROM\\t%POS\\t%REF\\t%ALT\\t%QUAL\\t%GT\\t%AD\\t%DP\\t%ANN\\n]" \\
         snps.ann.vcf.gz) > combined_snps_trans.txt
     
-    # Compress annotation VCF
-    bcftools index snps.ann.vcf.gz
     """
 }

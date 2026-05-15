@@ -1,6 +1,7 @@
 ```{bash}
 
 cd /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data
+conda activate gatk_gcnv
 nextflow run ../main.nf \
     --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_path.tsv \
     --ref /mnt/storage13/ahri/Anopheles_stephensi/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.fna \
@@ -8,6 +9,50 @@ nextflow run ../main.nf \
     --bed /mnt/storage13/ahri/Anopheles_stephensi/bed_file/resistance_regions.bed \
     --snpeff_db An_stephen \
     --outdir ./resistance_result \
-    -resume
+    -resume \
+    --workflow its
+
+
+# running for the cox 
+
+nextflow run ../main.nf \
+    --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_path.tsv \
+    --ref /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/sequence.fasta \
+    --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff \
+    --bed /mnt/storage13/ahri/Anopheles_stephensi/bed_file/cox_1_region.bed \
+    --snpeff_db An_stephen \
+    --outdir ./cox_result \
+    -resume \
+    --workflow cox
+# this runs smoothly and i need to add the to make the consensus file generation 
+
+# comand to make sample file with samle name and absolute path 
+cd /mnt/storage13/ahri/Anopheles_stephensi/run_1_An_stephensi
+echo -e "sample\tfastq" > sample_file_path.tsv
+
+for f in *.fastq.gz; do
+    sample=$(basename "$f" .fastq.gz)
+    echo -e "${sample}\t$(realpath "$f")" >> sample_file_path.tsv
+done
+
+cp /mnt/storage13/ahri/Anopheles_stephensi/run_1_An_stephensi/sample_file_path.tsv /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data
+
+cd /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data
+nextflow run ../main.nf \
+    --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_file_path.tsv \
+    --ref /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/sequence.fasta \
+    --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff \
+    --bed /mnt/storage13/ahri/Anopheles_stephensi/bed_file/cox_1_region.bed \
+    --snpeff_db An_stephen \
+    --outdir ./cox_result \
+    -resume \
+    --workflow cox
+
+```
+
+```{bash}
+# for the its region one thing i plan to do is that to extract the its reads from the sample fastq files , one of the reason for doing this is that the region is repetitive and align to different regions in the reference file so it is difficult to do the variant calling there 
+
+
 
 ```

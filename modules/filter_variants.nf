@@ -17,6 +17,7 @@ process FILTER_VARIANTS {
     
     output:
     path "filtered.vcf.gz", emit: filtered_vcf
+    path "filtering_stats.txt",emit: filtered_stats
     // path "filtering_stats.txt", emit: stats
     
     script:

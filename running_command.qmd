@@ -3,14 +3,14 @@
 cd /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data
 conda activate gatk_gcnv
 nextflow run ../main.nf \
-    --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_path.tsv \
+    --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_file_path.tsv \
     --ref /mnt/storage13/ahri/Anopheles_stephensi/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.fna \
     --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff \
     --bed /mnt/storage13/ahri/Anopheles_stephensi/bed_file/resistance_regions.bed \
     --snpeff_db An_stephen \
     --outdir ./resistance_result \
     -resume \
-    --workflow its
+    --workflow resistance
 
 
 # running for the cox 
@@ -53,6 +53,23 @@ nextflow run ../main.nf \
 ```{bash}
 # for the its region one thing i plan to do is that to extract the its reads from the sample fastq files , one of the reason for doing this is that the region is repetitive and align to different regions in the reference file so it is difficult to do the variant calling there 
 
+nextflow run ../main.nf     --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_path.tsv     --ref /mnt/storage13/ahri/Anopheles_stephensi/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.fna     --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff     --bed /mnt/storage13/ahri/Anopheles_stephensi/bed_file/resistance_regions.bed     --snpeff_db An_stephen     --outdir ./its_test        --workflow its --barcodes /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/barcodes/its_primer_barcodes.tsv -resume 
+
+# the above command is using to run the ITS analysis which extracts the reads of its from the fastq file and process the analysis 
+
+# one caution is that when using different sets of primer we need add the barcode primers sequences in the barcode files.
 
 
+
+```
+
+```{bash}
+# generating output from the clair so we can do the consensus 
+# this is for cox 
+conda activate muhaps-clair3 - which contain the clair and other tools 
+cd /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data
+nextflow run ../main.nf     --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_path.tsv     --ref /mnt/storage13/ahri/Anopheles_stephensi/reference/sequence.fasta     --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff     --bed /mnt/storage13/ahri/Anopheles_stephensi/bed_file/cox_1_region.bed    --snpeff_db An_stephen     --outdir ./clair_test        --workflow clair 
+
+
+# for running the 
 ```

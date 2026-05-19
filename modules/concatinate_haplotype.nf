@@ -13,3 +13,21 @@ process CONCAT_FASTAS {
     cat ${fastas.join(' ')} > combined.${group}.fasta
     """
 }
+
+process MERGE_FASTAS {
+
+    tag "${hap_type}"
+
+    publishDir "${params.outdir}/haplotypes", mode: 'copy'
+
+    input:
+    tuple val(hap_type), path(fasta_files)
+
+    output:
+    path("combined.${hap_type}.fasta")
+
+    script:
+    """
+    cat ${fasta_files} > combined.${hap_type}.fasta
+    """
+}

@@ -1,0 +1,9 @@
+name: r_plot
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - r-base=4.3
+  - r-tidyverse
+  - r-ggplot2
+  - r-readr

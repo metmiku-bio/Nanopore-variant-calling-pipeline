@@ -8,22 +8,35 @@ nextflow run ../main.nf \
     --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff \
     --bed /mnt/storage13/ahri/Anopheles_stephensi/bed_file/resistance_regions.bed \
     --snpeff_db An_stephen \
-    --outdir ./resistance_result \
+    --outdir ./resistance_result_test_an \
     -resume \
-    --workflow resistance
+    --workflow resistance \
+    -profile conda 
 
-
+cd /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data
+conda activate gatk_gcnv 
+nextflow run ../main.nf \
+    --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_path.tsv \
+    --ref /mnt/storage13/ahri/Anopheles_stephensi/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.fna \
+    --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff \
+    --bed /mnt/storage13/ahri/Anopheles_stephensi/bed_file/resistance_regions.bed \
+    --snpeff_db An_stephen \
+    --outdir ./resistance_result_test \
+    -resume \
+    --workflow resistance \
+    -profile conda 
 # running for the cox 
 
 nextflow run ../main.nf \
-    --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_path.tsv \
+    --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_file_path.tsv \
     --ref /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/sequence.fasta \
     --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff \
     --bed /mnt/storage13/ahri/Anopheles_stephensi/bed_file/cox_1_region.bed \
     --snpeff_db An_stephen \
     --outdir ./cox_result \
     -resume \
-    --workflow cox
+    --workflow cox \
+    -profile conda
 # this runs smoothly and i need to add the to make the consensus file generation 
 
 # comand to make sample file with samle name and absolute path 
@@ -68,8 +81,32 @@ nextflow run ../main.nf     --index_file /mnt/storage13/ahri/Anopheles_stephensi
 # this is for cox 
 conda activate muhaps-clair3 - which contain the clair and other tools 
 cd /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data
-nextflow run ../main.nf     --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_path.tsv     --ref /mnt/storage13/ahri/Anopheles_stephensi/reference/sequence.fasta     --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff     --bed /mnt/storage13/ahri/Anopheles_stephensi/bed_file/cox_1_region.bed    --snpeff_db An_stephen     --outdir ./clair_test        --workflow clair 
+nextflow run ../main.nf     --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_path.tsv     --ref /mnt/storage13/ahri/Anopheles_stephensi/reference/sequence.fasta     --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff     --bed /mnt/storage13/ahri/Anopheles_stephensi/bed_file/cox_1_region.bed    --snpeff_db An_stephen     --outdir ./clair_test        --workflow clair -profile conda
 
 
 # for running the 
+```
+
+```{bash}
+# for running the its reads for all of the samples 
+nextflow run ../main.nf     --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_file_path.tsv     --ref /mnt/storage13/ahri/Anopheles_stephensi/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.fna     --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff     --bed /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/bed/its_file.bed    --snpeff_db An_stephen     --outdir ./its_test        --workflow its --barcodes /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/barcodes/its_primer_barcodes.tsv   -profile conda -resume
+
+# with new reference of its2
+nextflow run ../main.nf     --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_path.tsv     --ref /mnt/storage13/ahri/Anopheles_stephensi/reference/its_reference_AY157678.1.fasta     --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff     --bed /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/bed/its_file.bed    --snpeff_db An_stephen     --outdir ./its_new_reference        --workflow its --barcodes /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/barcodes/its_primer_barcodes.tsv   -profile conda -resume
+
+
+bcftools index /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/its_new_reference/clair_only/clair_output/OHTNST_1744/OHTNST_1744.merge_output.vcf.gz
+    whatshap phase \
+        --reference /mnt/storage13/ahri/Anopheles_stephensi/reference/its_reference_AY157678.1.fasta \
+        --indels \
+        --sample OHTNST_1744 \
+        --ignore-read-groups \
+        -o /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/its_new_reference/clair_only/clair_output/OHTNST_1744/OHTNST_1744.merge_output_phase.vcf.gz \
+        /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/its_new_reference/clair_only/clair_output/OHTNST_1744/OHTNST_1744.merge_output.vcf.gz \
+        /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/its_new_reference/alignment/OHTNST_1744/OHTNST_1744.sorted.bam
+```
+
+```{bash}
+
+nextflow run ../main.nf     --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_path.tsv     --ref /mnt/storage13/ahri/Anopheles_stephensi/reference/its_reference_AY157678.1.fasta     --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff     --bed /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/bed/its_file.bed    --snpeff_db An_stephen     --outdir ./its_new_reference_two       --workflow clair -profile conda
 ```

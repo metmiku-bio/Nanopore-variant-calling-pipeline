@@ -1,4 +1,5 @@
 process EXTRACTING_READS {
+    conda "${projectDir}/envs/demux_env.yml"
 
     publishDir "${params.outdir}/its_reads/", mode: 'copy'
 
@@ -18,6 +19,8 @@ process EXTRACTING_READS {
         --log-prefix ${sample}
     rm -r  *.unassigned.fastq
     gzip -k *.fastq
+
+    
     """
     
 }

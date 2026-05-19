@@ -1,4 +1,5 @@
 process CALL_VARIANTS {
+    conda "${projectDir}/envs/freebayes.yml"
     tag "variant_calling"
     publishDir "${params.outdir}/variants/raw", mode: 'copy'
     
@@ -60,5 +61,56 @@ process CALL_VARIANTS {
     bcftools sort tmp.vcf.gz -Oz -o combined.genotyped.vcf.gz
 
     bcftools index combined.genotyped.vcf.gz
+    """
+}
+
+process FREEBAYES_ONLY {
+    conda "${projectDir}/envs/freebayes.yml"
+    tag "variant_calling using freebayes for individual samples"
+    publishDir "${params.outdir}/freebayes/", mode: 'copy'
+    
+    input:
+    tuple val(sample), path(bam), path(bai)
+    path(ref)
+    path(fai)
+    path(bed)
+
+    
+    output:
+    path "${sample}.freebayes.filtered.vcf.gz", emit: raw_vcf
+
+
+
+    script:
+    """
+# Variant calling
+    # Variant calling
+    freebayes \
+        -f ${ref} \
+        -t ${bed} \
+        ${bam} \
+        --haplotype-length -1 \
+        --min-coverage 10 \
+        --min-base-quality 20 \
+        --min-alternate-fraction 0.1 \
+        --ploidy 2 \
+        > ${sample}.freebayes.vcf
+
+    # Normalize
+    bcftools norm \
+        -f ${ref} \
+        -m -both \
+        ${sample}.freebayes.vcf \
+        -Ou \
+    | bcftools sort \
+        -Oz -o ${sample}.freebayes.norm.sorted.vcf.gz
+
+    # Filter
+    bcftools filter -i 'FMT/DP>10' -S .  ${sample}.freebayes.norm.sorted.vcf.gz | \\
+        bcftools view --threads 10 -i 'QUAL>20' | \\
+            bcftools sort -Oz -o ${sample}.freebayes.filtered.vcf.gz
+
+    # Index filtered VCF
+    bcftools index -f ${sample}.freebayes.filtered.vcf.gz
     """
 }

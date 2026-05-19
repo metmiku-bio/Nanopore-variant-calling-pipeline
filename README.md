@@ -1,66 +1,87 @@
 # Amplicon Nanopore Variant Calling Pipeline
 
-A Nextflow pipeline for amplicon-based variant calling from Nanopore sequencing data.
+This is a modular Nextflow pipeline designed for amplicon-based variant calling and consensus generation using Oxford Nanopore sequencing data.
 
-## Pipeline Overview
+## Features
 
-This pipeline takes Nanopore FASTQ files and a sample index, aligns the reads to a reference genome, calls and filters variants (SNPs and Indels), annotates them, calculates coverage, and generates final reports.
-
-**Pipeline Steps:**
-1. **Reference Indexing**: Prepares the reference genome (`INDEX_REFERENCE`)
-2. **Alignment**: Minimap2 alignment of Nanopore reads and sorting with samtools (`ALIGN_SAMPLE`)
-3. **Variant Calling**: Calls raw variants (`CALL_VARIANTS`)
-4. **Variant Filtering**: Filters variants based on minimum base quality and other metrics (`FILTER_VARIANTS`)
-5. **Annotation**: Annotates SNPs and Indels using SnpEff (`ANNOTATE_SNPS`, `ANNOTATE_INDELS`)
-6. **Coverage Calculation**: Determines sequencing coverage across amplicon regions (`CALCULATE_COVERAGE`)
-7. **Reporting**: Generates summary statistics and reports (`GENERATE_REPORTS`)
+- **Read Alignment:** Maps Nanopore reads to a reference genome.
+- **Coverage Calculation & Plotting:** Calculates depth of coverage across amplicons and generates HTML plots/reports (via R and Quarto).
+- **Variant Calling & Filtering:** Performs joint variant calling and subsequent filtering.
+- **Annotation:** Annotates SNPs and Indels using SnpEff.
+- **Consensus Generation (Clair3):** Utilizes Clair3 for accurate variant calling and consensus sequence generation, separating alleles by haplotype.
 
 ## Prerequisites
-- [Nextflow](https://www.nextflow.io/) (>= 20.04.0)
-- Container engine (Docker/Singularity/Conda) if using standard bioinformatics containers. 
+
+- **Nextflow:** Core execution engine.
+- **Docker / Singularity:** For running the custom pipeline environment.
+
+### Docker Environment
+
+The pipeline relies on a comprehensive Docker image containing all dependencies. It is built upon the official Clair3 GPU image and adds essential tools.
+
+To build the image:
+```bash
+docker build -t amplicon-pipeline:latest .
+```
+
+*Tools included in the image:* `clair3`, `samtools`, `bcftools`, `bedtools`, `freebayes`, `seqkit`, `R` (with `ggplot2`, `dplyr`, `plotly`, `DT`, `rmarkdown`), and `quarto`.
+
+## Input Requirements
+
+1. **Index File (`--index_file`):** A tab-separated values (TSV) file with a header mapping sample IDs to their corresponding FASTQ files.
+   ```tsv
+   sample	fastq
+   Sample_A	/path/to/Sample_A.fastq.gz
+   Sample_B	/path/to/Sample_B.fastq.gz
+   ```
+2. **Reference Genome (`--ref`):** Path to the reference FASTA file.
+3. **Target BED File (`--bed`):** Path to the BED file specifying the amplicon coordinates.
 
 ## Usage
 
-### 1. Prepare your Sample Index
-Create a CSV file containing your sample information. The header must include a column named `sample`. The pipeline will automatically parse this file and filter out empty entries.
+The pipeline execution is driven by the `--workflow` parameter. Currently, two main workflows are supported:
 
-### 2. Run the Pipeline
-Execute the pipeline from the command line, providing all the necessary paths and parameters:
+### 1. Resistance Workflow
+This workflow aligns reads, calculates coverage, performs joint variant calling, filters the variants, and annotates them.
 
 ```bash
 nextflow run main.nf \
-    --index_file path/to/samples.csv \
+    --workflow resistance \
+    --index_file path/to/index.tsv \
     --ref path/to/reference.fasta \
-    --gff path/to/annotation.gff \
     --bed path/to/amplicons.bed \
-    --snpeff_db my_snpeff_database \
-    --outdir ./results \
-    -resume
+    --snpeff_db "your_snpeff_db" \
+    --outdir ./results
 ```
 
-### Parameters
+### 2. Clair Consensus Workflow
+This workflow aligns reads, calculates coverage, runs Clair3 to phase and call variants, and extracts grouped consensus FASTA files based on amplicons and haplotypes.
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `--index_file` | `''` | CSV file containing sample IDs |
-| `--ref` | `''` | Path to the reference FASTA genome |
-| `--gff` | `''` | Path to the GFF annotation file |
-| `--bed` | `''` | Path to the BED file defining amplicon target regions |
-| `--threads` | `10` | Number of threads to use for parallelizable processes (e.g., Minimap2) |
-| `--min_base_qual`| `20` | Minimum base quality threshold for variant calling/filtering |
-| `--snpeff_db` | `''` | SnpEff database name for variant annotation |
-| `--outdir` | `./results` | Output directory for pipeline results |
+```bash
+nextflow run main.nf \
+    --workflow clair \
+    --index_file path/to/index.tsv \
+    --ref path/to/reference.fasta \
+    --bed path/to/amplicons.bed \
+    --outdir ./results
+```
 
-## Resource Management
+## Key Parameters
 
-The pipeline handles retries and resource scaling dynamically:
-- Default tasks receive 8 GB RAM and standard time allocations.
-- If a task fails and is retried, Nextflow doubles the memory and time allocation automatically.
-- Tasks labeled `high_memory` start with 32 GB RAM.
+| Parameter | Description | Default |
+| :--- | :--- | :--- |
+| `--workflow` | Select the pipeline sub-workflow to run (`resistance` or `clair`). | *Required* |
+| `--index_file` | Path to the TSV file mapping samples to read files. | `''` |
+| `--ref` | Path to the reference FASTA file. | `''` |
+| `--bed` | Path to the BED file with target regions. | `''` |
+| `--gff` | Path to the GFF annotation file. | `''` |
+| `--outdir` | Output directory for pipeline results. | `./results` |
+| `--threads` | Number of CPU threads allocated for parallel processes. | `10` |
+| `--min_base_qual`| Minimum base quality threshold for variant calling. | `20` |
+| `--snpeff_db` | Name of the SnpEff database to use for annotation. | `''` |
 
-## Output Structure
+## Pipeline Architecture
 
-Results are stored in the directory defined by `--outdir` (default: `./results`). Some expected outputs include:
-- `bam/`: Sorted BAM files, index `.bai` files, and `samtools flagstat` outputs.
-- `pipeline_info/`: Nextflow execution reports (timeline, resource usage trace, DAG).
-- Additional folders will contain the VCFs, coverage tables, and generated reports.
+- `main.nf`: The main Nextflow script defining the workflows.
+- `nextflow.config`: Contains default parameter values, execution profiles, and resource requests (CPUs, memory).
+- `modules/`: A directory containing the individual, reusable process definitions (e.g., alignment, variant calling, plotting).

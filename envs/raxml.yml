@@ -1,0 +1,9 @@
+# envs/raxml.yml
+name: raxml_env
+
+channels:
+  - bioconda
+  - conda-forge
+
+dependencies:
+  - raxml-ng

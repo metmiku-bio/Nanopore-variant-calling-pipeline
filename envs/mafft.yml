@@ -1,0 +1,9 @@
+# envs/mafft.yml
+name: mafft_env
+
+channels:
+  - bioconda
+  - conda-forge
+
+dependencies:
+  - mafft=7.525

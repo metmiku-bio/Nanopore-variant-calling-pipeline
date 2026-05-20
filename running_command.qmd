@@ -21,7 +21,7 @@ nextflow run ../main.nf \
     --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff \
     --bed /mnt/storage13/ahri/Anopheles_stephensi/bed_file/resistance_regions.bed \
     --snpeff_db An_stephen \
-    --outdir ./resistance_result_test \
+    --outdir ./resistance_result_test_2 \
     -resume \
     --workflow resistance \
     -profile conda 
@@ -109,4 +109,15 @@ bcftools index /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-
 ```{bash}
 
 nextflow run ../main.nf     --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_path.tsv     --ref /mnt/storage13/ahri/Anopheles_stephensi/reference/its_reference_AY157678.1.fasta     --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff     --bed /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/bed/its_file.bed    --snpeff_db An_stephen     --outdir ./its_new_reference_two       --workflow clair -profile conda
+```
+
+```{bash}
+
+# Updated script to accept both the cox and its analysis from alignment to making fasta file using clair , whatsap , bcftools consunses 
+nextflow run ../main.nf     --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/samp
+le_path.tsv     --its_ref /mnt/storage13/ahri/Anopheles_stephensi/reference/its_reference_AY157678.1.fasta    --cox_ref ../../reference/sequence.fasta  --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff        --snpeff_db An_stephen     --outdir ./its_new_reference_two       --workflow test  -profile conda --its_bed ../bed/its_file.bed  --cox_bed ../bed/cox.bed -resume
+
+# updated script for running the resistance target genes 
+nextflow run ../main.nf     --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_path.tsv     --ref /mnt/storage13/ahri/Anopheles_stephensi/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.fna     --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff     --bed /mnt/storage13/ahri/Anopheles_stephensi/bed_file/resistance_regions.bed     --snpeff_db An_stephen     --outdir ./resistance_result_test_2     -resume     --workflow resistance     -profile conda
+
 ```

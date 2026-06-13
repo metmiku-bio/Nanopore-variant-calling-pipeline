@@ -49,7 +49,7 @@ process CALCULATE_COVERAGE_COX {
 }
 
 process PLOT_COVERAGE_COX {
-    conda "/mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/envs/r_plot.yml"
+    conda "${projectDir}/envs/r_plot.yml"
 
     publishDir "${params.outdir}/cox/plots", mode: 'copy'
 

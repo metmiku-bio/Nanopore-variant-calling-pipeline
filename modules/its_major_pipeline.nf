@@ -49,8 +49,7 @@ process CALCULATE_COVERAGE_ITS {
 }
 
 process PLOT_COVERAGE_ITS {
-    conda "/mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/envs/r_plot.yml"
-
+    conda "${projectDir}/envs/r_plot.yml"
     publishDir "${params.outdir}/its/plots", mode: 'copy'
 
     input:

@@ -11,7 +11,7 @@ This is a modular Nextflow pipeline designed for amplicon-based variant calling 
 - **Consensus Generation (Clair3):** Utilizes Clair3 for accurate variant calling and consensus sequence generation, separating alleles by haplotype.
 
 ## Prerequisites - still underdevelopment the profile is now working on conda
-
+- **Clair3:** installing clair3 is mandatory for running the diversity markers then give the path of the tools and  version of the model  in the script/update_clair.sh 
 - **Nextflow:** Core execution engine.
 - **Docker / Singularity:** For running the custom pipeline environment. - still under development but can be used with conda environment since integrating clair3 makes it difficult
 

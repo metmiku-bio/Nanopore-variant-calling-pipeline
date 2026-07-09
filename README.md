@@ -5,15 +5,15 @@ This is a modular Nextflow pipeline designed for amplicon-based variant calling 
 ## Features
 
 - **Read Alignment:** Maps Nanopore reads to a reference genome.
-- **Coverage Calculation & Plotting:** Calculates depth of coverage across amplicons and generates HTML plots/reports (via R and Quarto).
-- **Variant Calling & Filtering:** Performs joint variant calling and subsequent filtering.
+- **Coverage Calculation & Plotting:** Calculates depth of coverage across amplicons and generates pdf plots/reports (via R ).
+- **Variant Calling & Filtering:** Performs variant calling using freebayes for the resistance and clair workflows .
 - **Annotation:** Annotates SNPs and Indels using SnpEff.
 - **Consensus Generation (Clair3):** Utilizes Clair3 for accurate variant calling and consensus sequence generation, separating alleles by haplotype.
 
-## Prerequisites
+## Prerequisites - still underdevelopment the profile is now working on conda
 
 - **Nextflow:** Core execution engine.
-- **Docker / Singularity:** For running the custom pipeline environment.
+- **Docker / Singularity:** For running the custom pipeline environment. - still under development but can be used with conda environment since integrating clair3 makes it difficult
 
 ### Docker Environment
 
@@ -45,25 +45,14 @@ The pipeline execution is driven by the `--workflow` parameter. Currently, two m
 This workflow aligns reads, calculates coverage, performs joint variant calling, filters the variants, and annotates them.
 
 ```bash
-nextflow run main.nf \
-    --workflow resistance \
-    --index_file path/to/index.tsv \
-    --ref path/to/reference.fasta \
-    --bed path/to/amplicons.bed \
-    --snpeff_db "your_snpeff_db" \
-    --outdir ./results
+nextflow run ../main.nf     --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_file_path.tsv     --ref /mnt/storage13/ahri/Anopheles_stephensi/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.fna     --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff     --bed /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/bed/resistance_region.bed     --snpeff_db An_stephen     --outdir ./     -resume     --workflow resistance     -profile conda
 ```
 
 ### 2. Clair Consensus Workflow
 This workflow aligns reads, calculates coverage, runs Clair3 to phase and call variants, and extracts grouped consensus FASTA files based on amplicons and haplotypes.
 
 ```bash
-nextflow run main.nf \
-    --workflow clair \
-    --index_file path/to/index.tsv \
-    --ref path/to/reference.fasta \
-    --bed path/to/amplicons.bed \
-    --outdir ./results
+nextflow run main.nf     --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_file_path.tsv     --its_ref /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/its_reference_NW_023405050.1:151506-152137.fasta   --cox_ref /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/sequence.fasta  --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff        --snpeff_db An_stephen     --outdir /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/its_updated_reference_result      --workflow clair  -profile conda --its_bed /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/bed/its_NW_023405050.1:151506-152137.bed  --cox_bed /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/bed/cox.bed
 ```
 
 ## Key Parameters
@@ -84,4 +73,4 @@ nextflow run main.nf \
 
 - `main.nf`: The main Nextflow script defining the workflows.
 - `nextflow.config`: Contains default parameter values, execution profiles, and resource requests (CPUs, memory).
-- `modules/`: A directory containing the individual, reusable process definitions (e.g., alignment, variant calling, plotting).
+- `modules/`: A directory containing the individual, reusable process definitions (e.g., alignment, variant calling, plotting). The main modules are the cox_major_pipeline.nf , its_major_pipeline.nf,and resistance_analysis.nf

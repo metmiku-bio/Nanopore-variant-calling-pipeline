@@ -191,11 +191,12 @@ process ANNOTATE_SNPS {
 
     input:
     path filtered_vcf
+    path ref
     val snpeff_db
     val threads
 
     output:
-    path "snps.ann.vcf.gz", emit: annotated_snps_vcf
+    path "snps.norm.ann.vcf.gz", emit: annotated_snps_vcf
     path "missense.vcf.gz", emit: missense_vcf
     path "missense_table.txt", emit: missense_table
     path "combined_snps_trans.txt", emit: snps_table
@@ -212,19 +213,28 @@ process ANNOTATE_SNPS {
 
     bcftools index snps.vcf.gz
 
+    # Normalising 
+    bcftools norm \
+        --threads ${threads} \
+        -f ${ref} \
+        -m -both \
+        -Oz -o snps.norm.vcf.gz \
+        snp.vcf.gz
+    bcftools index snps.norm.vcf.gz
+    
     # Annotate with snpEff
     java -jar /mnt/storage13/ahri/snpEff/snpEff.jar \
         ${snpeff_db} \
         -ud 0 \
-        snps.vcf.gz > snps.ann.vcf
+        snps.norm.vcf.gz > snps.norm.ann.vcf
 
-    bgzip -f snps.ann.vcf
-    bcftools index snps.ann.vcf.gz
+    bgzip -f snps.norm.ann.vcf
+    bcftools index snps.norm.ann.vcf.gz
 
     # Extract only missense variants
     bcftools view \
         -i 'ANN~"missense_variant"' \
-        snps.ann.vcf.gz \
+        snps.norm.ann.vcf.gz \
         -Oz -o missense.vcf.gz
 
     bcftools index missense.vcf.gz
@@ -235,7 +245,7 @@ process ANNOTATE_SNPS {
 
         bcftools query \
             -f "[%SAMPLE\\t%CHROM\\t%POS\\t%REF\\t%ALT\\t%QUAL\\t%GT\\t%AD\\t%DP\\t%ANN\\n]" \
-            snps.ann.vcf.gz
+            snps.norm.ann.vcf.gz
 
     ) > combined_snps_trans.txt
 
@@ -259,6 +269,7 @@ process ANNOTATE_INDELS {
     
     input:
     path filtered_vcf
+    path ref
     val snpeff_db
     val threads
     
@@ -266,13 +277,24 @@ process ANNOTATE_INDELS {
     path "indels.ann.vcf.gz", emit: annotated_indels_vcf
     path "combined_indels_trans.txt", emit: indels_table
     path "indels.vcf.gz", emit: raw_indels_vcf
+    path "indels.norm.ann.vcf.gz", emit: annotated_indels_vcf_norm
+    path "combined_norm_indels_trans.txt", emit: indels_table_norm
     
     script:
     """
     # Extract indels
     bcftools view --threads ${threads} -v indels ${filtered_vcf} -Oz -o indels.vcf.gz
     bcftools index indels.vcf.gz
-    
+
+    # Normalising 
+    bcftools norm \
+        --threads ${threads} \
+        -f ${ref} \
+        -m -both \
+        -Oz -o indels.norm.vcf.gz \
+        indels.vcf.gz
+    bcftools index indels.norm.vcf.gz
+
     # Annotate with snpEff
 
     java -jar  /mnt/storage13/ahri/snpEff/snpEff.jar ${snpeff_db} indels.vcf.gz > indels.ann.vcf
@@ -283,6 +305,15 @@ process ANNOTATE_INDELS {
     (echo -e "SAMPLE\\tCHROM\\tPOS\\tREF\\tALT\\tQUAL\\tGT\\tAD\\tDP\\tANN"; \\
         bcftools query -f "[%SAMPLE\\t%CHROM\\t%POS\\t%REF\\t%ALT\\t%QUAL\\t%GT\\t%AD\\t%DP\\t%ANN\\n]" \\
         indels.ann.vcf.gz) > combined_indels_trans.txt
+
+    java -jar  /mnt/storage13/ahri/snpEff/snpEff.jar ${snpeff_db} indels.norm.vcf.gz > indels.norm.ann.vcf
+    bgzip -f indels.norm.ann.vcf
+    bcftools index indels.norm.ann.vcf.gz
+    
+    # Convert to tabular format
+    (echo -e "SAMPLE\\tCHROM\\tPOS\\tREF\\tALT\\tQUAL\\tGT\\tAD\\tDP\\tANN"; \\
+        bcftools query -f "[%SAMPLE\\t%CHROM\\t%POS\\t%REF\\t%ALT\\t%QUAL\\t%GT\\t%AD\\t%DP\\t%ANN\\n]" \\
+        indels.norm.ann.vcf.gz) > combined_norm_indels_trans.txt
     
     """
 }

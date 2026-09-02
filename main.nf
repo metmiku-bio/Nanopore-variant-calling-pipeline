@@ -86,8 +86,8 @@ workflow RESISTANCE_ANALYSIS {
     filtered_vcf_ch = FILTER_VARIANTS(raw_vcf_ch, params.ref, params.bed, params.threads)
     
     // Annotate SNPs and indels
-    ANNOTATE_SNPS(filtered_vcf_ch.filtered_vcf, params.snpeff_db, params.threads)
-    ANNOTATE_INDELS(filtered_vcf_ch.filtered_vcf, params.snpeff_db, params.threads)
+    ANNOTATE_SNPS(filtered_vcf_ch.filtered_vcf, params.ref, params.snpeff_db, params.threads)
+    ANNOTATE_INDELS(filtered_vcf_ch.filtered_vcf, params.ref, params.snpeff_db, params.threads)
     
     // Optional: Create a summary
     Channel.of("Pipeline completed successfully!")

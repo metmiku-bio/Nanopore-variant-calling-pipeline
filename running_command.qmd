@@ -155,3 +155,41 @@ nextflow run main.nf     --index_file /mnt/storage13/ahri/Anopheles_stephensi/Na
 # updated script for running the resistance target genes 
 nextflow run ../main.nf     --index_file /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/test_data/sample_file_path.tsv     --ref /mnt/storage13/ahri/Anopheles_stephensi/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.fna     --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff     --bed /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/bed/resistance_region.bed     --snpeff_db An_stephen     --outdir ./     -resume     --workflow resistance     -profile conda
 ```
+
+```{bash}
+# comand to make sample file with samle name and absolute path 
+cd /mnt/storage13/ahri/Anopheles_stephensi/run_2_An_stephensi
+echo -e "sample\tfastq" > sample_file_path_2.tsv
+
+for f in *.fastq.gz; do
+    sample=$(basename "$f" .fastq.gz)
+    echo -e "${sample}\t$(realpath "$f")" >> sample_file_path_2.tsv
+done
+
+
+mkdir -p /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/run2_result 
+
+nextflow run main.nf     --index_file /mnt/storage13/ahri/Anopheles_stephensi/run_2_An_stephensi/sample_file_path_2.tsv     --its_ref /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/its_reference_NW_023405050.1:151506-152137.fasta   --cox_ref /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/sequence.fasta  --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff        --snpeff_db An_stephen     --outdir /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/run2_result      --workflow clair  -profile conda --its_bed /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/bed/its_NW_023405050.1:151506-152137.bed  --cox_bed /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/bed/cox.bed
+
+# updated script for running the resistance target genes 
+nextflow run main.nf     --index_file /mnt/storage13/ahri/Anopheles_stephensi/run_2_An_stephensi/sample_file_path_2.tsv     --ref /mnt/storage13/ahri/Anopheles_stephensi/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.fna     --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff     --bed /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/bed/resistance_region.bed     --snpeff_db An_stephen     --outdir /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/run2_result/Resistance_target      -resume     --workflow resistance     -profile conda
+```
+
+```{bash}
+
+cd /mnt/storage13/ahri/Anopheles_stephensi/run2_corrected_An_stephensi
+echo -e "sample\tfastq" > sample_file_path_2.tsv
+
+for f in *.fastq.gz; do
+    sample=$(basename "$f" .fastq.gz)
+    echo -e "${sample}\t$(realpath "$f")" >> sample_file_path_2.tsv
+done
+
+
+mkdir -p /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/run2_corrected_result
+
+nextflow run main.nf     --index_file /mnt/storage13/ahri/Anopheles_stephensi/run2_corrected_An_stephensi/sample_file_path_2.tsv     --its_ref /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/its_reference_NW_023405050.1:151506-152137.fasta   --cox_ref /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/sequence.fasta  --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff        --snpeff_db An_stephen     --outdir /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/run2_corrected_result      --workflow clair  -profile conda --its_bed /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/bed/its_NW_023405050.1:151506-152137.bed  --cox_bed /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/bed/cox.bed
+
+# updated script for running the resistance target genes 
+nextflow run main.nf     --index_file /mnt/storage13/ahri/Anopheles_stephensi/run2_corrected_An_stephensi/sample_file_path_2.tsv     --ref /mnt/storage13/ahri/Anopheles_stephensi/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.fna     --gff /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/reference/GCF_013141755.1_UCI_ANSTEP_V1.0_genomic.gff     --bed /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/bed/resistance_region.bed     --snpeff_db An_stephen     --outdir /mnt/storage13/ahri/Anopheles_stephensi/Nanopore-variant-calling-pipeline/run2_corrected_result/Resistance_target      -resume     --workflow resistance     -profile conda
+```

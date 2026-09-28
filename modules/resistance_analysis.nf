@@ -219,7 +219,7 @@ process ANNOTATE_SNPS {
         -f ${ref} \
         -m -both \
         -Oz -o snps.norm.vcf.gz \
-        snp.vcf.gz
+        snps.vcf.gz
     bcftools index snps.norm.vcf.gz
     
     # Annotate with snpEff

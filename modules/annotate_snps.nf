@@ -27,6 +27,7 @@ process ANNOTATE_SNPS {
 
     bcftools index snps.vcf.gz
 
+
     # Annotate with snpEff
     java -jar /mnt/storage13/ahri/snpEff/snpEff.jar \
         ${snpeff_db} \
